@@ -1,0 +1,195 @@
+#include "grid_printer.h"
+#include "../terminal/input.h"
+#include <fstream>
+#include <iomanip>
+#include <ncurses.h>
+#include <iostream>
+#include <string>
+#include <vector>
+
+void print_grid(const game& g) {
+    int width = g.get_width();
+    int height = g.get_height();
+    const auto& grid = g.get_grid();
+    
+    int start_y = 0;
+    int start_x = 0;
+    
+    // Header mit x-Koordinaten
+    mvprintw(start_y, start_x, "   ");  // Offset für y-Achse
+    for (int x = 0; x < width; x++) {
+        mvprintw(start_y, start_x + 3 + x * 4, "%2d ", x);
+    }
+    
+    // Zeichne obere Linie
+    start_y++;
+    mvprintw(start_y, start_x, "  +");
+    for (int x = 0; x < width; x++) {
+        mvprintw(start_y, start_x + 3 + x * 4, "---");
+    }
+    mvprintw(start_y, start_x + 3 + width * 4, "+");
+    
+    // Zeichne Grid mit Feldern
+    start_y++;
+    for (int y = 0; y < height; y++) {
+        mvprintw(start_y + y, start_x, "%2d|", y);
+        for (int x = 0; x < width; x++) {
+            const feld& current_field = grid[y][x];
+            
+            // Zeige Feld-Status basierend auf marked und reveald
+            if (current_field.marked) {
+                mvprintw(start_y + y, start_x + 3 + x * 4, " ! ");  // Flag
+            } else if (current_field.reveald) {
+                // Hier würde später die Anzahl der Minen in der Nähe stehen
+                mvprintw(start_y + y, start_x + 3 + x * 4, " . ");  // Leer
+            } else {
+                mvprintw(start_y + y, start_x + 3 + x * 4, " # ");  // Verdeckt
+            }
+        }
+        mvprintw(start_y + y, start_x + 3 + width * 4, "|");
+    }
+    
+    // Zeichne untere Linie
+    start_y += height;
+    mvprintw(start_y, start_x, "  +");
+    for (int x = 0; x < width; x++) {
+        mvprintw(start_y, start_x + 3 + x * 4, "---");
+    }
+    mvprintw(start_y, start_x + 3 + width * 4, "+");
+    
+    refresh();
+}
+
+void print_grid_from_file(const std::string& filename) {
+    std::ifstream file(filename);
+    
+    if (!file.is_open()) {
+        mvprintw(0, 0, "Could not open file: %s", filename.c_str());
+        refresh();
+        return;
+    }
+    
+    std::string line;
+    int row = 0;
+    
+    // Überspringe Header-Zeilen (falls vorhanden)
+    while (std::getline(file, line)) {
+        // Wenn die Zeile Koordinaten enthält (Format: (x, y))
+        if (line.find('(') != std::string::npos) {
+            // Parse und zeige die Zeile
+            mvprintw(row, 0, "%s", line.c_str());
+            row++;
+        }
+    }
+    
+    file.close();
+    refresh();
+}
+
+std::vector<int> hover_grid(game& g, int start_offset_y) {
+    int width = g.get_width();
+    int height = g.get_height();
+    auto& grid = g.get_grid();  // Non-const reference to allow modification
+    
+    int cursor_x = 0;
+    int cursor_y = 0;
+    int key;
+    
+    // Berechne Startposition für das Grid
+    int grid_start_y = start_offset_y;
+    int grid_start_x = 0;
+    
+    while (true) {
+        clear();
+        
+        // Header mit x-Koordinaten
+        mvprintw(grid_start_y, grid_start_x, "   ");  // Offset für y-Achse
+        for (int x = 0; x < width; x++) {
+            mvprintw(grid_start_y, grid_start_x + 3 + x * 4, "%2d ", x);
+        }
+        
+        // Zeichne obere Linie
+        int line_y = grid_start_y + 1;
+        mvprintw(line_y, grid_start_x, "  +");
+        for (int x = 0; x < width; x++) {
+            mvprintw(line_y, grid_start_x + 3 + x * 4, "---");
+        }
+        mvprintw(line_y, grid_start_x + 3 + width * 4, "+");
+        
+        // Zeichne Grid mit Feldern
+        int field_start_y = grid_start_y + 2;
+        for (int y = 0; y < height; y++) {
+            mvprintw(field_start_y + y, grid_start_x, "%2d|", y);
+            for (int x = 0; x < width; x++) {
+                const feld& current_field = grid[y][x];
+                
+                // Wenn dies das aktuelle Feld ist, hebe es hervor
+                if (x == cursor_x && y == cursor_y) {
+                    attron(A_REVERSE);  // Hervorhebung
+                }
+                
+                // Zeige Feld-Status basierend auf marked und reveald
+                if (current_field.marked) {
+                    mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " ! ");  // Flag
+                } else if (current_field.reveald) {
+                    mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " . ");  // Leer später zahl der grenzen
+                } else {
+                    mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " # ");  // Verdeckt
+                }
+                
+                if (x == cursor_x && y == cursor_y) {
+                    attroff(A_REVERSE);
+                }
+            }
+            mvprintw(field_start_y + y, grid_start_x + 3 + width * 4, "|");
+        }
+        
+        // Zeichne untere Linie
+        int bottom_y = field_start_y + height;
+        mvprintw(bottom_y, grid_start_x, "  +");
+        for (int x = 0; x < width; x++) {
+            mvprintw(bottom_y, grid_start_x + 3 + x * 4, "---");
+        }
+        mvprintw(bottom_y, grid_start_x + 3 + width * 4, "+");
+        
+        // Zeige aktuelle Position und Anweisungen
+        mvprintw(bottom_y + 2, grid_start_x, "Position: (%d, %d)", cursor_x, cursor_y);
+        mvprintw(bottom_y + 3, grid_start_x, "Arrow keys: move | f: mark/unmark | ENTER: select | ESC/q: quit");
+        
+        refresh();
+        
+        key = get_key();
+        
+        switch (key) {
+            case KEY_UP:
+                cursor_y = (cursor_y - 1 + height) % height;
+                break;
+            case KEY_DOWN:
+                cursor_y = (cursor_y + 1) % height;
+                break;
+            case KEY_LEFT:
+                cursor_x = (cursor_x - 1 + width) % width;
+                break;
+            case KEY_RIGHT:
+                cursor_x = (cursor_x + 1) % width;
+                break;
+            case 'r':
+            case 'R':
+                grid[cursor_y][cursor_x].reveal(g);
+                break;
+            case 'f':
+            case 'F':
+                // Markiere/entmarkiere das aktuelle Feld
+                grid[cursor_y][cursor_x].mark();
+                break;
+            case '\n':  // Enter key
+            case KEY_ENTER:
+            case 13:    // Alternative Enter code
+                return {cursor_x, cursor_y};
+            case 'q':
+            case 'Q':
+            case 27:    // ESC key
+                return {-1, -1};
+        }
+    }
+}

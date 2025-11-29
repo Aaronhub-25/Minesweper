@@ -1,9 +1,17 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include <string>
+// Initialize ncurses
+void init_input();
 
-void PrintBanner(const std::string& filepath);
+// Cleanup ncurses
+void cleanup_input();
+
+// Get a key press, returns key code
+// Returns special codes for arrow keys:
+// KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT (from ncurses)
+// Or regular character codes
+int get_key();
 
 #endif // INPUT_H
 

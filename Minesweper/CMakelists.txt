@@ -9,4 +9,13 @@ add_executable(Minesweper
 )
 
 set_property(TARGET Minesweper PROPERTY CXX_STANDARD 17)
+
+# Link ncurses library
+find_library(NCURSES_LIB ncurses)
+if(NCURSES_LIB)
+    target_link_libraries(Minesweper ${NCURSES_LIB})
+else()
+    # Fallback: try to link directly (works on most systems)
+    target_link_libraries(Minesweper ncurses)
+endif()
  
