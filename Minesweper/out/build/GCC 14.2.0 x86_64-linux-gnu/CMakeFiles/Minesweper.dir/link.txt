@@ -1,1 +1,0 @@
-/usr/bin/g++ -g -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/Minesweper.dir/src/main.cpp.o CMakeFiles/Minesweper.dir/src/terminal/input.cpp.o -o Minesweper

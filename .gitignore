@@ -1,0 +1,47 @@
+# CMake
+build/
+out/
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+*.cmake
+!CMakeLists.txt
+!CMakePresets.json
+*.cmake.in
+Makefile
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+
+# Docker
+*.dockerignore
+docker-compose.override.yml
+.docker/
+docker-compose.*.yml
+!docker-compose.yml
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Compiled files
+*.o
+*.obj
+*.class
+*.pyc
+__pycache__/
+
