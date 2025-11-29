@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.22)
+
+project(Minesweper VERSION 0.1.0 LANGUAGES CXX)
+
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+
+add_executable(Minesweper
+    ${SOURCES}
+)
+
+set_property(TARGET Minesweper PROPERTY CXX_STANDARD 17)
+ 

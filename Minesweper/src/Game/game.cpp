@@ -1,0 +1,3 @@
+// Jedes Spiel 
+
+class game 

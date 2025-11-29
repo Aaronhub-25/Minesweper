@@ -1,0 +1,3 @@
+/Users/aarondroge/Desktop/Minesweper/build/CMakeFiles/Minesweper.dir
+/Users/aarondroge/Desktop/Minesweper/build/CMakeFiles/edit_cache.dir
+/Users/aarondroge/Desktop/Minesweper/build/CMakeFiles/rebuild_cache.dir
