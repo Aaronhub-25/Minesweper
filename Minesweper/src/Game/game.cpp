@@ -63,12 +63,14 @@ void game::generate_plane() {
 void game::place_mines() {
     srand(time(nullptr));  // Seed für Zufallszahlen
     int mines_placed = 0;
+    mines_ids.clear();
     while (mines_placed < mine_count) {
         int x = rand() % width;
         int y = rand() % height;
         if (!grid[y][x].is_mine()) {
             grid[y][x].set_mine(true);
             mines_placed++;
+            mines_ids.push_back(y * width + x);
         }
     }
 }

@@ -24,6 +24,8 @@ private:
     
     void Enter_difficulty(const std::string& input);
     void build_game();  // Uses the difficulty member variable to define width hight mine count
+    //Sollte in private sein, nicht klar wie die nachbarn gezält werden sollen
+    std::vector<int> mines_ids; // ids of the mines werden auf der gerade f(x,y)=y*width+x gespeichert Später feld classe nach diesem system umbauen
     
     // Getter methods to access game parameters
     int get_width() const { return width; }

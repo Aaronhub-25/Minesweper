@@ -30,7 +30,7 @@ public:
     // Get mine status
     bool is_mine() const { return ismine; }
     // Count Mines arround
-    int count_mines_arround();
+    void count_mines_arround(game& g);
 };
 
 #endif // FELD_H

@@ -7,60 +7,6 @@
 #include <string>
 #include <vector>
 
-void print_grid(const game& g) {
-    int width = g.get_width();
-    int height = g.get_height();
-    const auto& grid = g.get_grid();
-    
-    int start_y = 0;
-    int start_x = 0;
-    
-    // Header mit x-Koordinaten
-    mvprintw(start_y, start_x, "   ");  
-    for (int x = 0; x < width; x++) {
-        mvprintw(start_y, start_x + 3 + x * 4, "%2d ", x);
-    }
-    
-    // Zeichne obere Linie
-    start_y++;
-    mvprintw(start_y, start_x, "  +");
-    for (int x = 0; x < width; x++) {
-        mvprintw(start_y, start_x + 3 + x * 4, "---");
-    }
-    mvprintw(start_y, start_x + 3 + width * 4, "+");
-    
-    // Zeichne Grid mit Feldern
-    start_y++;
-    for (int y = 0; y < height; y++) {
-        mvprintw(start_y + y, start_x, "%2d|", y);
-        for (int x = 0; x < width; x++) {
-            const feld& current_field = grid[y][x];
-            
-            // Zeige Feld-Status basierend auf marked und reveald
-            if (current_field.marked) {
-                mvprintw(start_y + y, start_x + 3 + x * 4, " ! ");  // Flag
-            } else if (current_field.reveald) {
-                // Hier würde später die Anzahl der Minen in der Nähe stehen
-                mvprintw(start_y + y, start_x + 3 + x * 4, " . ");  // Leer
-            } else {
-                mvprintw(start_y + y, start_x + 3 + x * 4, " # ");  // Verdeckt
-            }
-        }
-        mvprintw(start_y + y, start_x + 3 + width * 4, "|");
-    }
-    
-    // Zeichne untere Linie
-    start_y += height;
-    mvprintw(start_y, start_x, "  +");
-    for (int x = 0; x < width; x++) {
-        mvprintw(start_y, start_x + 3 + x * 4, "---");
-    }
-    mvprintw(start_y, start_x + 3 + width * 4, "+");
-    
-    refresh();
-}
-
-
 std::vector<int> hover_grid(game& g, int start_offset_y) {
     int width = g.get_width();
     int height = g.get_height();

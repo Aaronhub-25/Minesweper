@@ -27,3 +27,8 @@ void feld::reveal(game& g) {
     }
 }
 
+void feld::count_mines_arround(game& g) {
+    for (int mine : g.mines_ids) {
+        
+    }
+}
