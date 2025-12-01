@@ -16,6 +16,7 @@ public:
     std::vector<int> id;  // gibt die Position des Feldes an [x, y]
     bool marked;    // feld is either marked(1) or unmarked(0)
     bool reveald; //  feld is either reveald(1) or unreveald(0)
+    int mines_arround; // gibt Anzal an anliegenden Mineien an
     
     // Konstruktor
     feld(std::vector<int> position = {0, 0}) : id(position), ismine(false), marked(false), reveald(false) {}
@@ -28,6 +29,8 @@ public:
     void set_mine(bool mine) { ismine = mine; }
     // Get mine status
     bool is_mine() const { return ismine; }
+    // Count Mines arround
+    int count_mines_arround();
 };
 
 #endif // FELD_H

@@ -11,12 +11,13 @@ private:
     int width;
     int height;
     int mine_count;
+    int number_of_fields;
     std::vector<std::vector<feld>> grid;  // 2D Grid aus Feldern
-    void genrate_plane(); // Uses paramters to assaign felds their mines
-
-public:
+    
+    public:
     std::string difficulty;
-    bool game_state = 1; // 
+    int openfields; // number of open fields
+    bool game_state = 1; // game state 1 = running, 0 = game over
     
     // Konstruktor - erstellt Grid basierend auf width und height
     game();
@@ -30,9 +31,8 @@ public:
     int get_mine_count() const { return mine_count; }
     const std::vector<std::vector<feld>>& get_grid() const { return grid; }
     std::vector<std::vector<feld>>& get_grid() { return grid; }  // Non-const version for modification
-    
-    // Schreibt das Grid in eine txt-Datei
-    void write_grid_to_file(const std::string& filename) const;
+    void generate_plane();// Generates the plane with the correct number of fields
+    void place_mines();// Places mines on the grid
 };
 
 #endif // GAME_H

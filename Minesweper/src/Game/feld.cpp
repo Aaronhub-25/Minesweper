@@ -15,10 +15,15 @@ void feld::reveal(game& g) {
     // Reveal only if not already revealed
     if (!reveald) {
         reveald = true;
+        g.openfields--;
+        // Unmark field if it was marked, since it is now revealed
+        if (marked) {
+            marked = false;
+        }
         if (ismine) {
             g.game_state = 0; // Game over
         }
-        // hier noch zahl der nachbar mines 
+        // hier noch zahl der nachbar mines
     }
 }
 

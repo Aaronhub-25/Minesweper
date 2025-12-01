@@ -9,7 +9,7 @@ add_executable(Minesweper
 )
 
 set_property(TARGET Minesweper PROPERTY CXX_STANDARD 17)
-
+ 
 # Link ncurses library
 find_library(NCURSES_LIB ncurses)
 if(NCURSES_LIB)

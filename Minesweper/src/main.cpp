@@ -72,33 +72,48 @@ int main() {
     
     // Build game field based on difficulty
     minesweeper.build_game();
-    
-    // Write grid to file
-    minesweeper.write_grid_to_file("grid.txt");
+    minesweeper.generate_plane();
+    minesweeper.place_mines();
     
     // Display selected difficulty and game parameters
     init_input();
     clear();
     
     int info_y = 0;
-    mvprintw(info_y, 0, "Difficulty: %s", minesweeper.difficulty.c_str());
-    mvprintw(info_y + 1, 0, "Field size: %d x %d", minesweeper.get_width(), minesweeper.get_height());
-    mvprintw(info_y + 2, 0, "Mines: %d", minesweeper.get_mine_count());
-    mvprintw(info_y + 3, 0, "Grid written to grid.txt");
-    mvprintw(info_y + 4, 0, "");
-    
     // Print grid in nice format with hover functionality
     mvprintw(info_y + 4, 0, "Navigate with arrow keys, ENTER to select, ESC/q to quit");
-    while (minesweeper.game_state == 1){
+    while (minesweeper.game_state == 1 or minesweeper.openfields > 0){
         // Start hover mode
         std::vector<int> selected = hover_grid(minesweeper, info_y + 6);
         
         clear();
-        if (selected[0] >= 0 && selected[1] >= 0) {
+        
+        // Prüfe ob Spiel beendet wurde
+        if (selected[0] == -2 && selected[1] == -2) {
+            // Game Over - Mine wurde aufgedeckt
+            mvprintw(10, 0, "GAME OVER! You hit a mine!");
+            mvprintw(11, 0, "Press any key to exit...");
+            refresh();
+            get_key();
+            cleanup_input();
+            break;
+        } else if (selected[0] >= 0 && selected[1] >= 0) {
             mvprintw(10, 0, "Selected position: (%d, %d)", selected[0], selected[1]);
+            refresh();
+            get_key();
         } else {
             mvprintw(10, 0, "Selection cancelled");
+            refresh();
+            get_key();
         }
+        cleanup_input();
+    }
+    
+    // Prüfe ob Spiel gewonnen wurde
+    if (minesweeper.game_state == 1 && minesweeper.openfields == 0) {
+        clear();
+        mvprintw(10, 0, "CONGRATULATIONS! You won!");
+        mvprintw(11, 0, "Press any key to exit...");
         refresh();
         get_key();
         cleanup_input();

@@ -16,7 +16,7 @@ void print_grid(const game& g) {
     int start_x = 0;
     
     // Header mit x-Koordinaten
-    mvprintw(start_y, start_x, "   ");  // Offset für y-Achse
+    mvprintw(start_y, start_x, "   ");  
     for (int x = 0; x < width; x++) {
         mvprintw(start_y, start_x + 3 + x * 4, "%2d ", x);
     }
@@ -60,31 +60,6 @@ void print_grid(const game& g) {
     refresh();
 }
 
-void print_grid_from_file(const std::string& filename) {
-    std::ifstream file(filename);
-    
-    if (!file.is_open()) {
-        mvprintw(0, 0, "Could not open file: %s", filename.c_str());
-        refresh();
-        return;
-    }
-    
-    std::string line;
-    int row = 0;
-    
-    // Überspringe Header-Zeilen (falls vorhanden)
-    while (std::getline(file, line)) {
-        // Wenn die Zeile Koordinaten enthält (Format: (x, y))
-        if (line.find('(') != std::string::npos) {
-            // Parse und zeige die Zeile
-            mvprintw(row, 0, "%s", line.c_str());
-            row++;
-        }
-    }
-    
-    file.close();
-    refresh();
-}
 
 std::vector<int> hover_grid(game& g, int start_offset_y) {
     int width = g.get_width();
@@ -155,6 +130,7 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
         // Zeige aktuelle Position und Anweisungen
         mvprintw(bottom_y + 2, grid_start_x, "Position: (%d, %d)", cursor_x, cursor_y);
         mvprintw(bottom_y + 3, grid_start_x, "Arrow keys: move | f: mark/unmark | ENTER: select | ESC/q: quit");
+        mvprintw(bottom_y + 4, grid_start_x, "Open fields: %d", g.openfields);
         
         refresh();
         
@@ -176,6 +152,10 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
             case 'r':
             case 'R':
                 grid[cursor_y][cursor_x].reveal(g);
+                // Prüfe ob Spiel beendet wurde (Mine aufgedeckt)
+                if (g.game_state == 0 or g.openfields == 0) {
+                    return {-2, -2};  // Spezieller Code für Game Over
+                }
                 break;
             case 'f':
             case 'F':
