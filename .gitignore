@@ -8,6 +8,8 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
+CMakeLists.txtX
+CMakePresets.json
 _deps/
 *.cmake
 !CMakeLists.txt
@@ -24,6 +26,7 @@ Makefile
 
 # Docker
 *.dockerignore
+.devcontainer
 docker-compose.override.yml
 .docker/
 docker-compose.*.yml
