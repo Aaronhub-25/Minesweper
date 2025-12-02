@@ -1,5 +1,3 @@
-// Jedes Feld erhält eine public id mit 3 private Zuständen
-
 #include "feld.h"
 #include "game.h"
 #include <iostream>
@@ -28,7 +26,12 @@ void feld::reveal(game& g) {
 }
 
 void feld::count_mines_arround(game& g) {
-    for (int mine : g.mines_ids) {
-        
+    mines_arround = 0;
+    for (int y=0; y<g.get_height(); y++){
+        for (int x=0; x<g.get_width(); x++){ 
+        const feld& current_field = g.get_grid()[y][x]; 
+        // FRage warum hier get function im grid printe nur die Variable !!!!!!
+        // male 3x3 Box um jede und checke für alle ob sie eine mine sind
+        }
     }
 }

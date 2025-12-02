@@ -13,7 +13,7 @@ class feld
 private:
     bool ismine;
 public:
-    std::vector<int> id;  // gibt die Position des Feldes an [x, y]
+    std::vector<int> id;  // gibt die Position des Feldes an [x, y] // Sollte 1d sein mit geraden Gleichung f = width * x + y
     bool marked;    // feld is either marked(1) or unmarked(0)
     bool reveald; //  feld is either reveald(1) or unreveald(0)
     int mines_arround; // gibt Anzal an anliegenden Mineien an
