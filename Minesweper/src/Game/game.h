@@ -12,7 +12,7 @@ private:
     int height;
     int mine_count;
     int number_of_fields;
-    std::vector<std::vector<feld>> grid;  // 2D Grid aus Feldern
+    std::vector<std::vector<feld>> grid;  // 2D Grid aus Feldern 
     
     public:
     std::string difficulty;
