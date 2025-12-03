@@ -1,16 +1,13 @@
 #include "grid_printer.h"
 #include "../terminal/input.h"
-#include <fstream>
-#include <iomanip>
 #include <ncurses.h>
-#include <iostream>
 #include <string>
 #include <vector>
 
 std::vector<int> hover_grid(game& g, int start_offset_y) {
     int width = g.get_width();
     int height = g.get_height();
-    auto& grid = g.get_grid();  // Non-const reference to allow modification
+    const auto& grid = g.get_grid();  // Const reference for reading
     
     int cursor_x = 0;
     int cursor_y = 0;
@@ -42,7 +39,8 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
         for (int y = 0; y < height; y++) {
             mvprintw(field_start_y + y, grid_start_x, "%2d|", y);
             for (int x = 0; x < width; x++) {
-                const feld& current_field = grid[y][x];
+                int field_id = y * width + x;
+                const feld& current_field = grid[field_id];
                 
                 // Wenn dies das aktuelle Feld ist, hebe es hervor
                 if (x == cursor_x && y == cursor_y) {
@@ -50,10 +48,19 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
                 }
                 
                 // Zeige Feld-Status basierend auf marked und reveald
-                if (current_field.marked) {
+                if (current_field.is_marked()) {
                     mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " ! ");  // Flag
-                } else if (current_field.reveald) {
-                    mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " . ");  // Leer später zahl der grenzen
+                } else if (current_field.is_reveald()) {
+                    if (current_field.is_mine()) {
+                        mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " * ");  // Mine
+                    } else {
+                        int mines_around = current_field.get_mines_arround();
+                        if (mines_around == 0) {
+                            mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " . ");  // Leer
+                        } else {
+                            mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " %d ", mines_around);  // Zahl der benachbarten Minen
+                        }
+                    }
                 } else {
                     mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " # ");  // Verdeckt
                 }
@@ -76,7 +83,7 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
         // Zeige aktuelle Position und Anweisungen
         mvprintw(bottom_y + 2, grid_start_x, "Position: (%d, %d)", cursor_x, cursor_y);
         mvprintw(bottom_y + 3, grid_start_x, "Arrow keys: move | f: mark/unmark | ENTER: select | ESC/q: quit");
-        mvprintw(bottom_y + 4, grid_start_x, "Open fields: %d", g.openfields);
+        mvprintw(bottom_y + 4, grid_start_x, "Open fields: %d", g.get_openfields());
         
         refresh();
         
@@ -97,16 +104,25 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
                 break;
             case 'r':
             case 'R':
-                grid[cursor_y][cursor_x].reveal(g);
-                // Prüfe ob Spiel beendet wurde (Mine aufgedeckt)
-                if (g.game_state == 0 or g.openfields == 0) {
-                    return {-2, -2};  // Spezieller Code für Game Over
+                {
+                    int field_id = cursor_y * width + cursor_x;
+                    g.get_grid(field_id).reveal(g);
+                    // Prüfe ob Spiel beendet wurde
+                    if (!g.get_game_state()) {
+                        return {-2, -2};  // Spezieller Code für Game Over (Mine aufgedeckt)
+                    }
+                    if (g.get_openfields() == 0) {
+                        return {-3, -3};  // Spezieller Code für Win (alle Felder aufgedeckt)
+                    }
                 }
                 break;
             case 'f':
             case 'F':
-                // Markiere/entmarkiere das aktuelle Feld
-                grid[cursor_y][cursor_x].mark();
+                {
+                    // Markiere/entmarkiere das aktuelle Feld
+                    int field_id = cursor_y * width + cursor_x;
+                    g.get_grid(field_id).mark();
+                }
                 break;
             case '\n':  // Enter key
             case KEY_ENTER:

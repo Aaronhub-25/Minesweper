@@ -1,37 +1,57 @@
 #include "feld.h"
 #include "game.h"
-#include <iostream>
+
+int feld::get_id_x(const game& g) const {
+    return id % g.get_width();
+}
+
+int feld::get_id_y(const game& g) const {
+    return id / g.get_width();
+}
 
 void feld::mark() {
     // Toggle marked status; don't mark if already revealed
-    if (!reveald) {
-        marked = !marked;
+    if (!is_reveald()) {
+        set_marked(!is_marked());
     }
 }
 
 void feld::reveal(game& g) {
     // Reveal only if not already revealed
-    if (!reveald) {
-        reveald = true;
-        g.openfields--;
+    if (!is_reveald()) {
+        set_reveald(true);
+        g.decrement_openfields();
         // Unmark field if it was marked, since it is now revealed
-        if (marked) {
-            marked = false;
+        if (is_marked()) {
+            set_marked(false);
         }
-        if (ismine) {
-            g.game_state = 0; // Game over
+        if (is_mine()) {
+            g.set_game_state(false); // Game over
         }
         // hier noch zahl der nachbar mines
     }
 }
 
 void feld::count_mines_arround(game& g) {
-    mines_arround = 0;
-    for (int y=0; y<g.get_height(); y++){
-        for (int x=0; x<g.get_width(); x++){ 
-        const feld& current_field = g.get_grid()[y][x]; 
-        // FRage warum hier get function im grid printe nur die Variable !!!!!!
-        // male 3x3 Box um jede und checke für alle ob sie eine mine sind
+    int mines_arround = 0;
+    int current_y = get_id_y(g);
+    int current_x = get_id_x(g);
+    int width = g.get_width();
+    
+    // Zähle nur Nachbarn, nicht das aktuelle Feld selbst
+    for (int y = current_y - 1; y <= current_y + 1; y++) {
+        for (int x = current_x - 1; x <= current_x + 1; x++) {
+            // Überspringe das aktuelle Feld
+            if (y == current_y && x == current_x) {
+                continue;
+            }
+            if (y >= 0 && y < g.get_height() && x >= 0 && x < width) {
+                int neighbor_id = y * width + x;
+                if (g.get_grid(neighbor_id).is_mine()) {
+                    mines_arround++;
+                }
+            }
         }
     }
+    set_mines_arround(mines_arround);
 }

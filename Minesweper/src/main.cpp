@@ -1,11 +1,10 @@
-#include <iostream>
 #include <string>
 #include "terminal/input.h"
 #include "terminal/grid_printer.h"
 #include "Game/game.h"
 #include <ncurses.h>
 
-std::string Enter_difficulty() {
+std::string Difficulty_choser() {
     init_input();
     
     const int NUM_OPTIONS = 3;
@@ -64,7 +63,7 @@ std::string Enter_difficulty() {
 
 int main() {
     // Get difficulty from user
-    std::string difficulty = Enter_difficulty();
+    std::string difficulty = Difficulty_choser();
     
     // Create game instance and set difficulty
     game minesweeper;
@@ -73,16 +72,29 @@ int main() {
     // Build game field based on difficulty
     minesweeper.build_game();
     minesweeper.generate_plane();
-    minesweeper.place_mines();
+    int first_guess_id;
     
     // Display selected difficulty and game parameters
     init_input();
     clear();
     
     int info_y = 0;
+    // Get first guess from user
+    mvprintw(info_y + 2, 0, "Select your first field:");
+    refresh();
+    while (true) {
+        std::vector<int> selected = hover_grid(minesweeper, info_y + 6);
+        if (selected[0] >= 0 && selected[1] >= 0) {
+            first_guess_id = selected[0] + selected[1] * minesweeper.get_width();
+            break;
+        }
+    }
+    // Place mines on the grid
+    minesweeper.place_mines(first_guess_id);
     // Print grid in nice format with hover functionality
-    mvprintw(info_y + 4, 0, "Navigate with arrow keys, ENTER to select, ESC/q to quit");
-    while (minesweeper.game_state == 1 or minesweeper.openfields > 0){
+    clear();
+    mvprintw(info_y + 4, 0, "Navigate with arrow keys, f: mark/unmark, r: reveal, ESC/q: quit");
+    while (minesweeper.get_game_state() && minesweeper.get_openfields() > 0){
         // Start hover mode
         std::vector<int> selected = hover_grid(minesweeper, info_y + 6);
         
@@ -91,32 +103,31 @@ int main() {
         // Prüfe ob Spiel beendet wurde
         if (selected[0] == -2 && selected[1] == -2) {
             // Game Over - Mine wurde aufgedeckt
+            clear();
             mvprintw(10, 0, "GAME OVER! You hit a mine!");
             mvprintw(11, 0, "Press any key to exit...");
             refresh();
             get_key();
-            cleanup_input();
+            break;
+        } else if (selected[0] == -3 && selected[1] == -3) {
+            // Win - Alle Felder aufgedeckt
+            clear();
+            mvprintw(10, 0, "CONGRATULATIONS! You won!");
+            mvprintw(11, 0, "Press any key to exit...");
+            refresh();
+            get_key();
             break;
         } else if (selected[0] >= 0 && selected[1] >= 0) {
-            mvprintw(10, 0, "Selected position: (%d, %d)", selected[0], selected[1]);
-            refresh();
-            get_key();
+            // Feld wurde ausgewählt (Enter gedrückt) - sollte nicht passieren im Spiel-Loop
+            // Weiter zum nächsten Durchlauf
         } else {
-            mvprintw(10, 0, "Selection cancelled");
-            refresh();
-            get_key();
+            // ESC/q gedrückt - Spiel beenden
+            
+            break;
         }
-        cleanup_input();
     }
     
-    // Prüfe ob Spiel gewonnen wurde
-    if (minesweeper.game_state == 1 && minesweeper.openfields == 0) {
-        clear();
-        mvprintw(10, 0, "CONGRATULATIONS! You won!");
-        mvprintw(11, 0, "Press any key to exit...");
-        refresh();
-        get_key();
-        cleanup_input();
-    }
+    // Cleanup am Ende des Programms - immer aufrufen
+    cleanup_input();
     return 0;
 }
