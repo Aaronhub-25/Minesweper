@@ -47,12 +47,26 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
                 
                 // Zeige Feld-Status basierend auf marked und reveald
                 if (current_field.is_marked()) {
+                    // Flag - Rot
+                    if (has_colors()) attron(COLOR_PAIR(9));
                     mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " ! ");  // Flag
+                    if (has_colors()) attroff(COLOR_PAIR(9));
                 } else if (current_field.is_reveald()) {
                     if (current_field.is_mine()) {
+                        // Mine - Magenta
+                        if (has_colors()) attron(COLOR_PAIR(10));
                         mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " * ");  // Mine
+                        if (has_colors()) attroff(COLOR_PAIR(10));
                     } else {
-                        mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " %d ", current_field.get_mines_arround());  // Zahl der benachbarten Minen
+                        // Zahl der benachbarten Minen - verschiedene Farben je nach Zahl
+                        int mines_around = current_field.get_mines_arround();
+                        if (has_colors() && mines_around > 0 && mines_around <= 8) {
+                            attron(COLOR_PAIR(mines_around));
+                        }
+                        mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " %d ", mines_around);
+                        if (has_colors() && mines_around > 0 && mines_around <= 8) {
+                            attroff(COLOR_PAIR(mines_around));
+                        }
                     }
                 } else {
                     mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " # ");  // Verdeckt
