@@ -20,7 +20,7 @@ void game::build_game(const std::string& difficulty) {
         set_width(8);
         set_height(8);
         set_number_of_fields(get_width() * get_height());
-        set_mine_count(10);
+        set_mine_count(5);
         set_openfields(get_number_of_fields() - get_mine_count());
     }
     else if (get_difficulty() == "Advanced") {
@@ -123,7 +123,7 @@ void game::reveal_open_adjacent_fields(int id) {
     
     // WICHTIG: Nur aufdecken wenn Feld bereits aufgedeckt ist und keine benachbarten Minen hat
     // Dies verhindert Endlosschleifen und das Aufdecken von Minen
-    if (!current_field.is_reveald() || current_field.get_mines_arround() != 0) {
+    if (!current_field.is_reveald()) {
         return;
     }
     
@@ -146,6 +146,7 @@ void game::reveal_open_adjacent_fields(int id) {
                 // Reveal nur wenn nicht bereits aufgedeckt, nicht markiert und keine Mine
                 if (!neighbor.is_reveald() && !neighbor.is_marked() && !neighbor.is_mine()) {
                     neighbor.reveal(*this);
+
                     // reveal() ruft automatisch reveal_open_adjacent_fields() auf, wenn neighbor 0 Minen hat
                     // Daher müssen wir hier nicht rekursiv aufrufen
                 }

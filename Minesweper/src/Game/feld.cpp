@@ -30,10 +30,10 @@ void feld::reveal(game& g) {
             return; // Stop here if mine was revealed
         }
         
-         // Wenn das Feld keine benachbarten Minen hat, decke automatisch alle Nachbarn auf
-        //if (get_mines_arround() == 0) {
-         //   g.reveal_open_adjacent_fields(id);
-        //}
+        // Wenn das Feld keine benachbarten Minen hat, decke automatisch alle Nachbarn auf
+        if (get_mines_arround() == 0) {
+            g.reveal_open_adjacent_fields(id);
+        }
     }
 }
 

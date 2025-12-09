@@ -77,6 +77,7 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
         mvprintw(bottom_y + 2, grid_start_x, "Position: (%d, %d)", cursor_x, cursor_y);
         mvprintw(bottom_y + 3, grid_start_x, "Arrow keys: move | f: mark/unmark | r: reveal | ESC/q: quit");
         mvprintw(bottom_y + 4, grid_start_x, "Open fields: %d", g.get_openfields());
+        mvprintw(bottom_y + 5, grid_start_x, "Mines: %d", g.get_mine_count());
         
         refresh();
         
@@ -102,12 +103,13 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
                     // Reveal nur wenn Feld nicht bereits aufgedeckt ist
                     if (!g.get_grid(field_id).is_reveald()) {
 
-                        g.get_grid(field_id).reveal(g);
                         if (!g.get_first_gues_done()) {
                             g.set_first_guess_done(true);
                             g.set_first_guess_id(field_id);
                             g.place_mines(g.get_first_guess_id());
                         }
+                        g.get_grid(field_id).reveal(g);
+                        // reveal() ruft automatisch reveal_open_adjacent_fields() auf, wenn das Feld 0 Minen hat
                         // Prüfe ob Spiel beendet wurde
                         if (!g.get_game_state()) {
                             return {-2, -2};  // Spezieller Code für Game Over (Mine aufgedeckt)

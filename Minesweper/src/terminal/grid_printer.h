@@ -2,7 +2,7 @@
 #define GRID_PRINTER_H
 
 #include "../Game/game.h"
-#include <string>
+
 
 // Interaktive Grid-Anzeige mit Hover-Funktionalität
 // Gibt die ausgewählte Position zurück (x, y) oder (-1, -1) bei ESC/q
