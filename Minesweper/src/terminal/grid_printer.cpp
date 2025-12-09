@@ -1,13 +1,11 @@
 #include "grid_printer.h"
 #include "../terminal/input.h"
 #include <ncurses.h>
-#include <string>
 #include <vector>
 
 std::vector<int> hover_grid(game& g, int start_offset_y) {
     int width = g.get_width();
     int height = g.get_height();
-    const auto& grid = g.get_grid();  // Const reference for reading
     
     int cursor_x = 0;
     int cursor_y = 0;
@@ -40,7 +38,7 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
             mvprintw(field_start_y + y, grid_start_x, "%2d|", y);
             for (int x = 0; x < width; x++) {
                 int field_id = y * width + x;
-                const feld& current_field = grid[field_id];
+                const feld& current_field = g.get_grid(field_id);
                 
                 // Wenn dies das aktuelle Feld ist, hebe es hervor
                 if (x == cursor_x && y == cursor_y) {
@@ -54,12 +52,7 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
                     if (current_field.is_mine()) {
                         mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " * ");  // Mine
                     } else {
-                        int mines_around = current_field.get_mines_arround();
-                        if (mines_around == 0) {
-                            mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " . ");  // Leer
-                        } else {
-                            mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " %d ", mines_around);  // Zahl der benachbarten Minen
-                        }
+                        mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " %d ", current_field.get_mines_arround());  // Zahl der benachbarten Minen
                     }
                 } else {
                     mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " # ");  // Verdeckt
@@ -82,7 +75,7 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
         
         // Zeige aktuelle Position und Anweisungen
         mvprintw(bottom_y + 2, grid_start_x, "Position: (%d, %d)", cursor_x, cursor_y);
-        mvprintw(bottom_y + 3, grid_start_x, "Arrow keys: move | f: mark/unmark | ENTER: select | ESC/q: quit");
+        mvprintw(bottom_y + 3, grid_start_x, "Arrow keys: move | f: mark/unmark | r: reveal | ESC/q: quit");
         mvprintw(bottom_y + 4, grid_start_x, "Open fields: %d", g.get_openfields());
         
         refresh();
@@ -106,13 +99,25 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
             case 'R':
                 {
                     int field_id = cursor_y * width + cursor_x;
-                    g.get_grid(field_id).reveal(g);
-                    // Prüfe ob Spiel beendet wurde
-                    if (!g.get_game_state()) {
-                        return {-2, -2};  // Spezieller Code für Game Over (Mine aufgedeckt)
-                    }
-                    if (g.get_openfields() == 0) {
-                        return {-3, -3};  // Spezieller Code für Win (alle Felder aufgedeckt)
+                    // Reveal nur wenn Feld nicht bereits aufgedeckt ist
+                    if (!g.get_grid(field_id).is_reveald()) {
+
+                        g.get_grid(field_id).reveal(g);
+                        if (!g.get_first_gues_done()) {
+                            g.set_first_guess_done(true);
+                            g.set_first_guess_id(field_id);
+                            g.place_mines(g.get_first_guess_id());
+                        }
+                        // Prüfe ob Spiel beendet wurde
+                        if (!g.get_game_state()) {
+                            return {-2, -2};  // Spezieller Code für Game Over (Mine aufgedeckt)
+                        }
+                        if (g.get_openfields() == 0) {
+                            return {-3, -3};  // Spezieller Code für Win (alle Felder aufgedeckt)
+                        }
+                        // Nach erfolgreichem Reveal: Grid wird beim nächsten Durchlauf der while-Schleife aktualisiert
+                        // Cursor bleibt an der aktuellen Position
+                        continue; // Überspringe den Rest und zeichne Grid neu
                     }
                 }
                 break;

@@ -27,8 +27,13 @@ void feld::reveal(game& g) {
         }
         if (is_mine()) {
             g.set_game_state(false); // Game over
+            return; // Stop here if mine was revealed
         }
-        // hier noch zahl der nachbar mines
+        
+         // Wenn das Feld keine benachbarten Minen hat, decke automatisch alle Nachbarn auf
+        //if (get_mines_arround() == 0) {
+         //   g.reveal_open_adjacent_fields(id);
+        //}
     }
 }
 
