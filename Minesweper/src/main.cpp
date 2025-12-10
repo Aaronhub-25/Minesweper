@@ -22,10 +22,6 @@ int main() {
     clear();
     
     int info_y = 0;
-
-   
-
-    // Print grid in nice format with hover functionality
     clear();
     mvprintw(info_y + 4, 0, "Navigate with arrow keys, f: mark/unmark, r: reveal, ESC/q: quit");
     while (true) {  // Schleife wird über Return-Codes von hover_grid gesteuert

@@ -38,7 +38,7 @@ public:
     int get_openfields() const { return openfields; } // get number of open fields
     int get_first_guess_id() const { return first_guess_id;} // get id of first guess
     bool get_game_state() const { return game_state; } // get game state
-    bool get_first_gues_done() const {return first_guess_done;} // get first guess done
+    bool get_first_guess_done() const {return first_guess_done;} // get first guess done
     int get_number_of_fields() const { return number_of_fields; } // get number of fields
 
     std::string get_difficulty() const { return difficulty; } // get difficulty

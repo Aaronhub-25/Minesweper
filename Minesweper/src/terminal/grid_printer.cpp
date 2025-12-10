@@ -117,7 +117,7 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
                     // Reveal nur wenn Feld nicht bereits aufgedeckt ist
                     if (!g.get_grid(field_id).is_reveald()) {
 
-                        if (!g.get_first_gues_done()) {
+                        if (!g.get_first_guess_done()) {
                             g.set_first_guess_done(true);
                             g.set_first_guess_id(field_id);
                             g.place_mines(g.get_first_guess_id());
