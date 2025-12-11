@@ -162,10 +162,6 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
                     g.get_grid(field_id).mark();
                 }
                 break;
-            case '\n':  // Enter key
-            case KEY_ENTER:
-            case 13:    // Alternative Enter code
-                return {cursor_x, cursor_y};
             case 'q':
             case 'Q':
             case 27:    // ESC key
