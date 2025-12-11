@@ -13,7 +13,7 @@ void init_input() {
         noecho();               // Don't echo input characters
         keypad(stdscr, TRUE);   // Enable special keys (arrow keys, function keys, etc.)
         curs_set(0);            // Hide cursor (optional, can be set to 1 to show)
-        nodelay(stdscr, FALSE); // Wait for input (set to TRUE for non-blocking)
+        nodelay(stdscr, TRUE);  // Ist an um fps selber zu managen
         
         // Initialize colors if terminal supports it
         if (has_colors()) {

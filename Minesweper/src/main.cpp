@@ -47,10 +47,8 @@ int main() {
             refresh();
             get_key();
             break;
-        } else if (selected[0] >= 0 && selected[1] >= 0) {
-            // Feld wurde ausgewählt (Enter gedrückt) - sollte nicht passieren im Spiel-Loop
-            // Weiter zum nächsten Durchlauf
-        } else {
+
+        } else if (selected[0] == -1 && selected[1] == -1) {
             // ESC/q gedrückt - Spiel beenden
             break;
         }

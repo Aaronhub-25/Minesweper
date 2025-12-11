@@ -1,9 +1,14 @@
 #include "grid_printer.h"
 #include "../terminal/input.h"
+#include "fps_tracker.h"
 #include <ncurses.h>
 #include <vector>
 
 std::vector<int> hover_grid(game& g, int start_offset_y) {
+    // FPS-Management
+    FPSTracker fps_tracker(30);  // 60 FPS Ziel
+
+    //get width and height
     int width = g.get_width();
     int height = g.get_height();
     
@@ -14,6 +19,8 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
     // Berechne Startposition für das Grid
     int grid_start_y = start_offset_y;
     int grid_start_x = 0;
+    
+    fps_tracker.start_frame();  // Starte Zeitmessung für ersten Frame
     
     while (true) {
         clear();
@@ -92,10 +99,20 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
         mvprintw(bottom_y + 3, grid_start_x, "Arrow keys: move | f: mark/unmark | r: reveal | ESC/q: quit");
         mvprintw(bottom_y + 4, grid_start_x, "Open fields: %d", g.get_openfields());
         mvprintw(bottom_y + 5, grid_start_x, "Mines: %d", g.get_mine_count());
-        
+        mvprintw(bottom_y + 6, grid_start_x, "FPS: %f", fps_tracker.get_current_fps());
+       
         refresh();
         
+        // FPS-Management: Warte auf nächsten Frame und starte Zeitmessung für nächsten Frame
+        fps_tracker.wait_for_next_frame();
+        fps_tracker.start_frame();
+        
         key = get_key();
+        
+        // Wenn keine Eingabe verfügbar ist, zeichne einfach weiter
+        if (key == ERR) {
+            continue;
+        }
         
         switch (key) {
             case KEY_UP:
