@@ -29,6 +29,9 @@ public:
     
     // Gibt die Ziel-FPS zurück
     int get_target_fps() const { return target_fps; }
-};
 
+    // Warte 5 Frames
+    void wait_for_5_frames();
+
+};
 #endif // FPS_TRACKER_H

@@ -20,6 +20,7 @@ void feld::reveal(game& g) {
     // Reveal only if not already revealed
     if (!is_reveald()) {
         set_reveald(true);
+
         g.decrement_openfields();
         // Unmark field if it was marked, since it is now revealed
         if (is_marked()) {
@@ -30,9 +31,9 @@ void feld::reveal(game& g) {
             return; // Stop here if mine was revealed
         }
         
-        // Wenn das Feld keine benachbarten Minen hat, decke automatisch alle Nachbarn auf
+        // Wenn das Feld keine benachbarten Minen hat, füge Nachbarn zur Reveal-Liste hinzu
         if (get_mines_arround() == 0) {
-            g.reveal_open_adjacent_fields(id);
+            g.add_fields_to_reveal_if_0_mines_arround(id);
         }
     }
 }

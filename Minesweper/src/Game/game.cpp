@@ -8,6 +8,7 @@ game::game() : width(0), height(0), mine_count(0), number_of_fields(0), difficul
     grid.clear(); // Stelle sicher, dass grid leer ist
     mines_ids.clear(); // Stelle sicher, dass mines_ids leer ist
     available_ids.clear(); // Stelle sicher, dass available_ids leer ist
+    fields_to_reveal.clear(); // Stelle sicher, dass fields_to_reveal leer ist
 }
 
 
@@ -110,8 +111,8 @@ void game::place_mines(int first_guess_id) {
     }
 }
 
-void game::reveal_open_adjacent_fields(int id) {
-    // Reveal all adjacent fields if current field has 0 mines around and is revealed
+void game::add_fields_to_reveal_if_0_mines_arround(int id) {
+    // Add fields to reveal if 0 mines around
     // This implements the standard Minesweeper behavior: empty fields automatically reveal neighbors
     
     // Prüfe ob Feld gültig ist
@@ -131,7 +132,7 @@ void game::reveal_open_adjacent_fields(int id) {
     int current_x = current_field.get_id_x(*this);
     int width = get_width();
 
-    // Reveal alle benachbarten Felder rekursiv
+    // Add alle benachbarten Felder zur Reveal-Liste rekursiv
     for (int y = current_y - 1; y <= current_y + 1; y++) {
         for (int x = current_x - 1; x <= current_x + 1; x++) {
             // Überspringe das aktuelle Feld
@@ -143,14 +144,49 @@ void game::reveal_open_adjacent_fields(int id) {
                 int neighbor_id = y * width + x;
                 feld& neighbor = grid[neighbor_id];
                 
-                // Reveal nur wenn nicht bereits aufgedeckt, nicht markiert und keine Mine
+                // Add fields to reveal if not already revealed, not marked, and not a mine
                 if (!neighbor.is_reveald() && !neighbor.is_marked() && !neighbor.is_mine()) {
-                    neighbor.reveal(*this);
-
-                    // reveal() ruft automatisch reveal_open_adjacent_fields() auf, wenn neighbor 0 Minen hat
-                    // Daher müssen wir hier nicht rekursiv aufrufen
+                    // Prüfe ob Feld bereits in der Liste ist (vermeide Duplikate)
+                    bool already_in_list = false;
+                    for (int existing_id : fields_to_reveal) {
+                        if (existing_id == neighbor_id) {
+                            already_in_list = true;
+                            break;
+                        }
+                    }
+                    if (!already_in_list) {
+                        add_field_to_reveal(neighbor_id);
+                        // Wenn das Nachbarfeld auch 0 Minen hat, füge dessen Nachbarn rekursiv hinzu
+                        if (neighbor.get_mines_arround() == 0) {
+                            add_fields_to_reveal_if_0_mines_arround(neighbor_id);
+                        }
+                    }
                 }
             }
         }
     }
+}
+
+void game::reveal_open_adjacent_fields(int id) {
+    // Reveal a single field (used for delayed reveal from fields_to_reveal list)
+    if (id < 0 || id >= number_of_fields) {
+        return;
+    }
+    
+    feld& field = grid[id];
+    if (!field.is_reveald() && !field.is_marked()) {
+        field.reveal(*this);
+        // Wenn das Feld 0 Minen hat, füge Nachbarn zur Reveal-Liste hinzu
+        if (field.get_mines_arround() == 0) {
+            add_fields_to_reveal_if_0_mines_arround(id);
+        }
+    }
+}
+
+void game::remove_field_to_reveal(int id) {
+    // Remove field from reveal list
+    fields_to_reveal.erase(
+        std::remove(fields_to_reveal.begin(), fields_to_reveal.end(), id),
+        fields_to_reveal.end()
+    );
 }

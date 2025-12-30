@@ -103,8 +103,19 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
        
         refresh();
         
-        // FPS-Management: Warte auf nächsten Frame und starte Zeitmessung für nächsten Frame
+        // FPS-Management: Warte auf nächsten Frame und starte Zeitmessung für nächsten Frame. Falls noch Felder aufzudecken sind. Alle 5 Frames ein Feld aufdecken.
         fps_tracker.wait_for_next_frame();
+        std::vector<int> fields_to_reveal = g.get_fields_to_reveal();
+        if (!fields_to_reveal.empty()) {
+            static int frame_counter = 0;
+            frame_counter++;
+            if (frame_counter >= 5) {
+                frame_counter = 0;
+                int field = fields_to_reveal[0];
+                g.reveal_open_adjacent_fields(field);
+                g.remove_field_to_reveal(field);
+            }
+        }
         fps_tracker.start_frame();
         
         key = get_key();
@@ -140,7 +151,7 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
                             g.place_mines(g.get_first_guess_id());
                         }
                         g.get_grid(field_id).reveal(g);
-                        // reveal() ruft automatisch reveal_open_adjacent_fields() auf, wenn das Feld 0 Minen hat
+                        // reveal() fügt automatisch Felder zu fields_to_reveal hinzu, wenn das Feld 0 Minen hat
                         // Prüfe ob Spiel beendet wurde
                         if (!g.get_game_state()) {
                             return {-2, -2};  // Spezieller Code für Game Over (Mine aufgedeckt)

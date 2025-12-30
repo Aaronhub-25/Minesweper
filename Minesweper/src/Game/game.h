@@ -20,6 +20,7 @@ private:
     bool first_guess_done; // tracks wheter first guess was done is zero zu beginn
     std::vector<int> mines_ids; // ids of the mines werden auf der gerade f(x,y)=y*width+x gespeichert
     std::vector<int> available_ids; // alle verfügbaren IDs für Minen-Platzierung
+    std::vector<int> fields_to_reveal; // alle Felder, die aufgedeckt werden müssen
     
 public:
     // Konstruktor - erstellt Grid basierend auf width und height
@@ -28,9 +29,13 @@ public:
     void build_game(const std::string& difficulty);  // Sets difficulty and builds game field based on difficulty
     void generate_plane();// Generates the plane with the correct number of fields
     void place_mines(int first_guess_id); // Places mines on the grid
-    void reveal_open_adjacent_fields(int id); // Reveal all adjacent fields if current field has 0 mines around
+    void reveal_open_adjacent_fields(int id); // Reveal a single field (used for delayed reveal)
     void decrement_openfields() { openfields--; } // decreses number of open fields
-    
+    void add_field_to_reveal(int id) { fields_to_reveal.push_back(id); } // add field to reveal
+    void remove_field_to_reveal(int id); // remove field from reveal
+    void add_fields_to_reveal_if_0_mines_arround(int id); // add fields to reveal if 0 mines around
+
+
     // Getter methods
     int get_width() const { return width; } // get width of the game
     int get_height() const { return height; } // get height of the game
@@ -40,6 +45,7 @@ public:
     bool get_game_state() const { return game_state; } // get game state
     bool get_first_guess_done() const {return first_guess_done;} // get first guess done
     int get_number_of_fields() const { return number_of_fields; } // get number of fields
+    std::vector<int> get_fields_to_reveal() const { return fields_to_reveal; } // get fields to reveal
 
     std::string get_difficulty() const { return difficulty; } // get difficulty
     const std::vector<feld>& get_grid() const { return grid; } // get grid

@@ -36,3 +36,7 @@ void FPSTracker::wait_for_next_frame() {
         last_fps_update = now;
     }
 }
+
+void FPSTracker::wait_for_5_frames() {
+    usleep(5 * 1000 / target_fps);
+}
