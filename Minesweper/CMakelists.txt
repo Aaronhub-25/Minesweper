@@ -2,6 +2,23 @@ cmake_minimum_required(VERSION 3.22)
 
 project(Minesweper VERSION 0.1.0 LANGUAGES CXX)
 
+# Set C++ standard explicitly
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
+# macOS specific settings
+if(APPLE)
+    # Enable universal binaries option (optional)
+    option(BUILD_UNIVERSAL "Build universal binary for both arm64 and x86_64" OFF)
+    if(BUILD_UNIVERSAL)
+        set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64" CACHE STRING "Build architectures")
+    endif()
+    
+    # Set minimum macOS version (adjust if needed)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS version")
+endif()
+
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
 add_executable(Minesweper
@@ -10,12 +27,34 @@ add_executable(Minesweper
 
 set_property(TARGET Minesweper PROPERTY CXX_STANDARD 17)
  
-# Link ncurses library
-find_library(NCURSES_LIB ncurses)
-if(NCURSES_LIB)
-    target_link_libraries(Minesweper ${NCURSES_LIB})
+# Link ncurses library - improved detection for macOS
+if(APPLE)
+    # On macOS, ncurses is usually available via Homebrew or system
+    find_library(NCURSES_LIB 
+        NAMES ncurses
+        PATHS 
+            /usr/lib
+            /usr/local/lib
+            /opt/homebrew/lib
+            /opt/local/lib
+    )
+    
+    if(NCURSES_LIB)
+        target_link_libraries(Minesweper ${NCURSES_LIB})
+        message(STATUS "Found ncurses: ${NCURSES_LIB}")
+    else()
+        # Fallback: try to link directly
+        target_link_libraries(Minesweper ncurses)
+        message(STATUS "Linking ncurses directly (library path not found)")
+    endif()
 else()
-    # Fallback: try to link directly (works on most systems)
-    target_link_libraries(Minesweper ncurses)
+    # For non-macOS systems, use standard find_library
+    find_library(NCURSES_LIB ncurses)
+    if(NCURSES_LIB)
+        target_link_libraries(Minesweper ${NCURSES_LIB})
+    else()
+        # Fallback: try to link directly (works on most systems)
+        target_link_libraries(Minesweper ncurses)
+    endif()
 endif()
  
