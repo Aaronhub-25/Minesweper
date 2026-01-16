@@ -1,10 +1,10 @@
-#include "Difficulty_choser.h"
+#include "start_page.h"
 #include "input.h"
 #include <ncurses.h>
 #include <string>
 
 
-std::string Difficulty_choser() {
+std::string Start_page() {
     init_input();
     
     const int NUM_OPTIONS = 3;

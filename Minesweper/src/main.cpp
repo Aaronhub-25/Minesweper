@@ -1,7 +1,8 @@
 #include <string>
 #include "terminal/input.h"
-#include "terminal/Difficulty_choser.h"
+#include "terminal/end_page.h"
 #include "terminal/grid_printer.h"
+#include "terminal/start_page.h"
 #include "Game/game.h"
 #include <ncurses.h>
 
@@ -9,52 +10,52 @@
 
 int main() {
     // Get difficulty from user
-    std::string difficulty = Difficulty_choser();
+    std::string difficulty = Start_page();
     
-    // Create game instance and build field with difficulty
-    game minesweeper;
-    minesweeper.build_game(difficulty);
-    minesweeper.generate_plane();
+    while (true){
+        // Create game instance and build field with difficulty
+        game minesweeper;
+        minesweeper.build_game(difficulty);
+        minesweeper.generate_plane();
 
     
-    // Display selected difficulty and game parameters
-    init_input();
-    clear();
-    
-    int info_y = 0;
-    clear();
-    mvprintw(info_y + 4, 0, "Navigate with arrow keys, f: mark/unmark, r: reveal, ESC/q: quit");
-    while (true) {  // Schleife wird über Return-Codes von hover_grid gesteuert
-        // Start hover mode
-        std::vector<int> selected = hover_grid(minesweeper, info_y + 6);
-        
+        // Display selected difficulty and game parameters
+        init_input();
         clear();
-        
-        // Prüfe ob Spiel beendet wurde
-        if (selected[0] == -2 && selected[1] == -2) {
-            // Game Over - Mine wurde aufgedeckt
-            clear();
-            mvprintw(10, 0, "GAME OVER! You hit a mine!");
-            mvprintw(11, 0, "Press any key to exit...");
-            refresh();
-            get_key();
-            break;
-        } else if (selected[0] == -3 && selected[1] == -3) {
-            // Win - Alle Felder aufgedeckt
-            clear();
-            mvprintw(10, 0, "CONGRATULATIONS! You won!");
-            mvprintw(11, 0, "Press any key to exit...");
-            refresh();
-            get_key();
-            break;
+    
+        int info_y = 0;
+        clear();
+        mvprintw(info_y + 4, 0, "Navigate with arrow keys, f: mark/unmark, r: reveal, ESC/q: quit");
 
-        } else if (selected[0] == -1 && selected[1] == -1) {
-            // ESC/q gedrückt - Spiel beenden
+        bool game_finished = false;
+        while (!game_finished) {  // Schleife wird über Return-Codes von hover_grid gesteuert
+            // Start hover mode and check for game end conditions
+            std::vector<int> selected = hover_grid(minesweeper, info_y + 6);
+
+            // Check if the game has ended (either loss or win)
+            if (selected.size() >= 2) {
+                if (selected == std::vector<int>{-2, -2}) {
+                    // Game Over (Mine revealed)
+                    game_finished = true;
+                } else if (selected == std::vector<int>{-3, -3}) {
+                    // Win (all cells revealed)
+                    game_finished = true;
+                }
+            }
+            clear();
+        }
+        std::string result = End_page(minesweeper.get_game_state());
+        if (result == "Play again") {
+            continue;
+        }
+        else if (result == "Change Difficulty") {
+            difficulty = Start_page();
+            continue;
+        }
+        else if (result == "Exit") {
             break;
         }
     }
-    
-    // Cleanup am Ende des Programms - immer aufrufen
     cleanup_input();
     return 0;
 }
