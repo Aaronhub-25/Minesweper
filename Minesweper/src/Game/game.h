@@ -29,7 +29,7 @@ public:
     void build_game(const std::string& difficulty);  // Sets difficulty and builds game field based on difficulty
     void generate_plane();// Generates the plane with the correct number of fields
     void place_mines(int first_guess_id); // Places mines on the grid
-    void reveal_open_adjacent_fields(int id); // Reveal a single field (used for delayed reveal)
+    void reveal_open_adjacent_fields(int id); // Reveal a single field
     void decrement_openfields() { openfields--; } // decreses number of open fields
     void add_field_to_reveal(int id) { fields_to_reveal.push_back(id); } // add field to reveal
     void remove_field_to_reveal(int id); // remove field from reveal

@@ -13,7 +13,7 @@ int main() {
     std::string difficulty = Start_page();
     
     while (true){
-        // Create game instance and build field with difficulty
+        // Construkt minesweper spiel
         game minesweeper;
         minesweeper.build_game(difficulty);
         minesweeper.generate_plane();
@@ -32,13 +32,13 @@ int main() {
             // Start hover mode and check for game end conditions
             std::vector<int> selected = hover_grid(minesweeper, info_y + 6);
 
-            // Check if the game has ended (either loss or win)
+            // Check if the game has ended 
             if (selected.size() >= 2) {
                 if (selected == std::vector<int>{-2, -2}) {
-                    // Game Over (Mine revealed)
+                    // Lsot
                     game_finished = true;
                 } else if (selected == std::vector<int>{-3, -3}) {
-                    // Win (all cells revealed)
+                    // Win 
                     game_finished = true;
                 }
             }
