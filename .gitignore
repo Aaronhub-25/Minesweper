@@ -23,7 +23,7 @@ Makefile
 *.dll
 *.exe
 *.out
-*.chache
+*.cache
 
 # Docker
 *.dockerignore
