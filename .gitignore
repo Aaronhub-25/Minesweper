@@ -1,5 +1,7 @@
 # CMake
 build/
+build-local/
+build-docker/
 out/
 CMakeCache.txt
 CMakeFiles/
