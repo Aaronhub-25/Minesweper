@@ -1,0 +1,182 @@
+#include "round.h"
+#include "../terminal/input.h"
+#include "fps_tracker.h"
+#include <ncurses.h>
+#include <vector>
+
+std::vector<int> hover_grid(game& g, int start_offset_y) {
+    // FPS-Management
+    FPSTracker fps_tracker(30);  // 60 FPS Ziel
+
+    //get width and height
+    int width = g.get_width();
+    int height = g.get_height();
+    
+    int cursor_x = 0;
+    int cursor_y = 0;
+    int key;
+    
+    // Berechne Startposition für das Grid
+    int grid_start_y = start_offset_y;
+    int grid_start_x = 0;
+    
+    fps_tracker.start_frame();  // Starte Zeitmessung für ersten Frame
+    
+    while (true) {
+        clear();
+        
+        // Header mit x-Koordinaten
+        mvprintw(grid_start_y, grid_start_x, "   ");  // Offset für y-Achse
+        for (int x = 0; x < width; x++) {
+            mvprintw(grid_start_y, grid_start_x + 3 + x * 4, "%2d ", x);
+        }
+        
+        // Zeichne obere Linie
+        int line_y = grid_start_y + 1;
+        mvprintw(line_y, grid_start_x, "  +");
+        for (int x = 0; x < width; x++) {
+            mvprintw(line_y, grid_start_x + 3 + x * 4, "---");
+        }
+        mvprintw(line_y, grid_start_x + 3 + width * 4, "+");
+        
+        // Zeichne Grid mit Feldern
+        int field_start_y = grid_start_y + 2;
+        for (int y = 0; y < height; y++) {
+            mvprintw(field_start_y + y, grid_start_x, "%2d|", y);
+            for (int x = 0; x < width; x++) {
+                int field_id = y * width + x;
+                const feld& current_field = g.get_grid(field_id);
+                
+                // Wenn dies das aktuelle Feld ist, hebe es hervor
+                if (x == cursor_x && y == cursor_y) {
+                    attron(A_REVERSE);  // Hervorhebung
+                }
+                
+                // Zeige Feld-Status basierend auf marked und reveald
+                if (current_field.is_marked()) {
+                    // Flag - Rot
+                    if (has_colors()) attron(COLOR_PAIR(9));
+                    mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " ! ");  // Flag
+                    if (has_colors()) attroff(COLOR_PAIR(9));
+                } else if (current_field.is_reveald()) {
+                    if (current_field.is_mine()) {
+                        // Mine - Magenta
+                        if (has_colors()) attron(COLOR_PAIR(10));
+                        mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " * ");  // Mine
+                        if (has_colors()) attroff(COLOR_PAIR(10));
+                    } else {
+                        // Zahl der benachbarten Minen - verschiedene Farben je nach Zahl
+                        int mines_around = current_field.get_mines_arround();
+                        if (has_colors() && mines_around > 0 && mines_around <= 8) {
+                            attron(COLOR_PAIR(mines_around));
+                        }
+                        mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " %d ", mines_around);
+                        if (has_colors() && mines_around > 0 && mines_around <= 8) {
+                            attroff(COLOR_PAIR(mines_around));
+                        }
+                    }
+                } else {
+                    mvprintw(field_start_y + y, grid_start_x + 3 + x * 4, " # ");  // Verdeckt
+                }
+                
+                if (x == cursor_x && y == cursor_y) {
+                    attroff(A_REVERSE);
+                }
+            }
+            mvprintw(field_start_y + y, grid_start_x + 3 + width * 4, "|");
+        }
+        
+        // Zeichne untere Linie
+        int bottom_y = field_start_y + height;
+        mvprintw(bottom_y, grid_start_x, "  +");
+        for (int x = 0; x < width; x++) {
+            mvprintw(bottom_y, grid_start_x + 3 + x * 4, "---");
+        }
+        mvprintw(bottom_y, grid_start_x + 3 + width * 4, "+");
+        
+        // Zeige aktuelle Position und Anweisungen
+        mvprintw(bottom_y + 2, grid_start_x, "Position: (%d, %d)", cursor_x, cursor_y);
+        mvprintw(bottom_y + 3, grid_start_x, "Arrow keys: move | f: mark/unmark | r: reveal | ESC/q: quit");
+        mvprintw(bottom_y + 4, grid_start_x, "Open fields: %d", g.get_openfields());
+        mvprintw(bottom_y + 5, grid_start_x, "Mines: %d", g.get_mine_count());
+        mvprintw(bottom_y + 6, grid_start_x, "FPS: %f", fps_tracker.get_current_fps());
+       
+        refresh();
+        
+        // FPS-Management: Warte auf nächsten Frame und starte Zeitmessung für nächsten Frame. Falls noch Felder aufzudecken sind. Alle 5 Frames ein Feld aufdecken.
+        fps_tracker.wait_for_next_frame();
+        std::vector<int> fields_to_reveal = g.get_fields_to_reveal();
+        if (!fields_to_reveal.empty()) {
+            static int frame_counter = 0;
+            frame_counter++;
+            if (frame_counter >= 5) {
+                frame_counter = 0;
+                int field = fields_to_reveal[0];
+                g.reveal_open_adjacent_fields(field);
+                g.remove_field_to_reveal(field);
+            }
+        }
+        fps_tracker.start_frame();
+        
+        key = get_key();
+        
+        // Wenn keine Eingabe verfügbar ist, zeichne einfach weiter
+        if (key == ERR) {
+            continue;
+        }
+        
+        switch (key) {
+            case KEY_UP:
+                cursor_y = (cursor_y - 1 + height) % height;
+                break;
+            case KEY_DOWN:
+                cursor_y = (cursor_y + 1) % height;
+                break;
+            case KEY_LEFT:
+                cursor_x = (cursor_x - 1 + width) % width;
+                break;
+            case KEY_RIGHT:
+                cursor_x = (cursor_x + 1) % width;
+                break;
+            case 'r':
+            case 'R':
+                {
+                    int field_id = cursor_y * width + cursor_x;
+                    // Reveal nur wenn Feld nicht bereits aufgedeckt ist
+                    if (!g.get_grid(field_id).is_reveald()) {
+
+                        if (!g.get_first_guess_done()) {
+                            g.set_first_guess_done(true);
+                            g.set_first_guess_id(field_id);
+                            g.place_mines(g.get_first_guess_id());
+                        }
+                        g.get_grid(field_id).reveal(g);
+                        // reveal() fügt automatisch Felder zu fields_to_reveal hinzu, wenn das Feld 0 Minen hat
+                        // Prüfe ob Spiel beendet wurde
+                        if (!g.get_game_state()) {
+                            return {-2, -2};  // Spezieller Code für Game Over (Mine aufgedeckt)
+                        }
+                        if (g.get_openfields() == 0) {
+                            return {-3, -3};  // Spezieller Code für Win (alle Felder aufgedeckt)
+                        }
+                        // Nach erfolgreichem Reveal: Grid wird beim nächsten Durchlauf der while-Schleife aktualisiert
+                        // Cursor bleibt an der aktuellen Position
+                        continue; // Überspringe den Rest und zeichne Grid neu
+                    }
+                }
+                break;
+            case 'f':
+            case 'F':
+                {
+                    // Markiere/entmarkiere das aktuelle Feld
+                    int field_id = cursor_y * width + cursor_x;
+                    g.get_grid(field_id).mark();
+                }
+                break;
+            case 'q':
+            case 'Q':
+            case 27:    // ESC key
+                return {-1, -1};
+        }
+    }
+}
