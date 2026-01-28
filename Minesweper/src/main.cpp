@@ -1,7 +1,7 @@
 #include <string>
 #include "terminal/input.h"
 #include "terminal/end_page.h"
-#include "terminal/grid_printer.h"
+#include "terminal/round.h"
 #include "terminal/start_page.h"
 #include "Game/game.h"
 #include <ncurses.h>
@@ -28,6 +28,7 @@ int main() {
         mvprintw(info_y + 4, 0, "Navigate with arrow keys, f: mark/unmark, r: reveal, ESC/q: quit");
 
         bool game_finished = false;
+        std::string end_result;
         while (!game_finished) {  // Schleife wird über Return-Codes von hover_grid gesteuert
             // Start hover mode and check for game end conditions
             std::vector<int> selected = hover_grid(minesweeper, info_y + 6);
@@ -36,15 +37,21 @@ int main() {
             if (selected.size() >= 2) {
                 if (selected == std::vector<int>{-2, -2}) {
                     // Lsot
+                    end_result = "Lost";
                     game_finished = true;
                 } else if (selected == std::vector<int>{-3, -3}) {
                     // Win 
+                    end_result = "Won";
                     game_finished = true;
+                } else if (selected == std::vector<int>{-1, -1}) {
+                    // Invalid input
+                    end_result = "Exited Game";
+                    break;
                 }
             }
             clear();
         }
-        std::string result = End_page(minesweeper.get_game_state());
+        std::string result = End_page(end_result);
         if (result == "Play again") {
             continue;
         }

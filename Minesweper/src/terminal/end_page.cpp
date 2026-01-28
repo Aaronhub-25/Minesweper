@@ -4,7 +4,7 @@
 #include <string>
 
 
-std::string End_page(bool game_won) {
+std::string End_page(std::string end_result) {
     init_input();
     
     const int NUM_OPTIONS = 3;
@@ -21,12 +21,7 @@ std::string End_page(bool game_won) {
         clear();
         
         //Result
-        if (game_won == true) {
-            mvprintw(5, 0, "You won!");
-        }
-        else if (game_won == false) {
-            mvprintw(5, 0, "You Lost!");
-        }
+        mvprintw(5, 0, end_result.c_str());
 
         // Display options
         for (int i = 0; i < NUM_OPTIONS; i++) {
