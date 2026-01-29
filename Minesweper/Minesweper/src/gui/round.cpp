@@ -1,5 +1,5 @@
 #include "round.h"
-#include "../terminal/input.h"
+#include "input.h"
 #include "fps_tracker.h"
 #include <ncurses.h>
 #include <vector>

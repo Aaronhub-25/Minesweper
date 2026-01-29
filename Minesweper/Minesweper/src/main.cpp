@@ -1,9 +1,9 @@
 #include <string>
-#include "terminal/input.h"
-#include "terminal/end_page.h"
-#include "terminal/round.h"
-#include "terminal/start_page.h"
-#include "Game/game.h"
+#include "gui/input.h"
+#include "gui/end_page.h"
+#include "gui/round.h"
+#include "gui/start_page.h"
+#include "game_logic/game.h"
 #include <ncurses.h>
 
 
