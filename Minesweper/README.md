@@ -188,9 +188,8 @@ chmod 755 build-local build-docker
 ```
 Minesweper/
 ├── src/
-│   ├── Game/          # Spiel-Logik
-│   └── terminal/      # Terminal-UI
-├── build/             # Altes Build-Verzeichnis
+│   ├── game_logic/          # Spiel-Logik
+│   └── gui/      # Terminal-UI
 ├── build-local/       # Lokale macOS Builds
 ├── build-docker/      # Docker/Linux Builds
 ├── CMakeLists.txt     # CMake Konfiguration

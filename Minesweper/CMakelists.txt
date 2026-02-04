@@ -19,13 +19,29 @@ if(APPLE)
     set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0" CACHE STRING "Minimum macOS version")
 endif()
 
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+# Collect sources explicitly from the intended subprojects. This avoids
+# accidentally recursing into nested projects and compiling duplicate
+# implementations (e.g. multiple `input.cpp`).
+file(GLOB_RECURSE SOURCES
+    "${CMAKE_SOURCE_DIR}/Minesweper/src/*.cpp"
+    "${CMAKE_SOURCE_DIR}/common/*.cpp"
+)
+
+# Remove any accidental duplicates in the list
+list(REMOVE_DUPLICATES SOURCES)
 
 add_executable(Minesweper
     ${SOURCES}
 )
 
 set_property(TARGET Minesweper PROPERTY CXX_STANDARD 17)
+
+# Make sure the compiler can find headers from `common` and the nested
+# `Minesweper/src` so includes like "common/input.h" resolve correctly.
+target_include_directories(Minesweper PRIVATE
+    ${CMAKE_SOURCE_DIR}/common
+    ${CMAKE_SOURCE_DIR}/Minesweper/src
+)
  
 # Link ncurses library - improved detection for macOS
 if(APPLE)

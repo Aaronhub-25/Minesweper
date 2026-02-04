@@ -1,7 +1,7 @@
 #ifndef GRID_PRINTER_H
 #define GRID_PRINTER_H
 
-#include "../Game/game.h"
+#include "../game_logic/game.h"
 
 
 // Interaktive Grid-Anzeige mit Hover-Funktionalität
