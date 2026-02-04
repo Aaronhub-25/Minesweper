@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include "feld.h"
-#include "../terminal/coustum_difficulty.h"
+#include "../gui/coustum_difficulty.h"
 
 class game
 {

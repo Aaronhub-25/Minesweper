@@ -1,6 +1,6 @@
 // Jedes Spiel 
 #include "game.h"
-#include "../terminal/coustum_difficulty.h"
+#include "../gui/coustum_difficulty.h"
 #include <random>
 #include <algorithm>
 
