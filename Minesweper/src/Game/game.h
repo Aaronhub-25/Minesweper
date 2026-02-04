@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "feld.h"
+#include "../terminal/coustum_difficulty.h"
 
 class game
 {
@@ -27,6 +28,7 @@ public:
     game();
     
     void build_game(const std::string& difficulty);  // Sets difficulty and builds game field based on difficulty
+    void build_game_coustom(const CustomSettings& settings); // Sets custom settings and builds game field
     void generate_plane();// Generates the plane with the correct number of fields
     void place_mines(int first_guess_id); // Places mines on the grid
     void reveal_open_adjacent_fields(int id); // Reveal a single field

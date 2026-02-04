@@ -3,6 +3,7 @@
 #include "terminal/end_page.h"
 #include "terminal/round.h"
 #include "terminal/start_page.h"
+#include "terminal/coustum_difficulty.h"
 #include "Game/game.h"
 #include <ncurses.h>
 
@@ -13,9 +14,18 @@ int main() {
     std::string difficulty = Start_page();
     
     while (true){
-        // Construkt minesweper spiel
         game minesweeper;
-        minesweeper.build_game(difficulty);
+
+        // Check if custom difficulty was selected
+        if (difficulty == "Coustom") {
+            CustomSettings custom = ask_coustum_settings();
+            minesweeper.build_game_coustom(custom);
+        }
+        else if (difficulty == "Beginner" || difficulty == "Advanced" || difficulty == "Professional") {
+            //
+            minesweeper.build_game(difficulty);
+        
+        }
         minesweeper.generate_plane();
 
     

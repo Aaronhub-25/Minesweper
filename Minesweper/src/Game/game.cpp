@@ -1,5 +1,6 @@
 // Jedes Spiel 
 #include "game.h"
+#include "../terminal/coustum_difficulty.h"
 #include <random>
 #include <algorithm>
 
@@ -48,6 +49,15 @@ void game::build_game(const std::string& difficulty) {
     }
     // build_game() setzt nur die Parameter, das Grid wird von generate_plane() erstellt
 }
+
+void game::build_game_coustom(const CustomSettings& settings) {
+    set_width(settings.width);
+    set_height(settings.height);
+    set_number_of_fields(get_width() * get_height());
+    set_mine_count(settings.mines);
+    set_openfields(get_number_of_fields() - get_mine_count());
+    // build_game() setzt nur die Parameter, das Grid wird von generate_plane() erstellt
+}   
 
 void game::generate_plane() {
     // Erstelle Grid mit Feldern - stelle sicher, dass alle Felder zurückgesetzt sind

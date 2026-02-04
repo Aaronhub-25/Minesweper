@@ -7,11 +7,12 @@
 std::string Start_page() {
     init_input();
     
-    const int NUM_OPTIONS = 3;
+    const int NUM_OPTIONS = 4;
     const char* options[] = {
         "Beginner",
         "Advanced",
-        "Professional"
+        "Professional",
+        "Coustom"
     };
     
     int selected = 0;
@@ -60,3 +61,4 @@ std::string Start_page() {
         }
     }
 }
+
