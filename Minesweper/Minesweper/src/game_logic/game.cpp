@@ -4,6 +4,8 @@
 #include <random>
 #include <algorithm>
 
+
+
 // Konstruktor - initialisiert mit Standardwerten
 game::game() : width(0), height(0), mine_count(0), number_of_fields(0), difficulty("Beginner"), openfields(0), first_guess_id(-1), game_state(true), first_guess_done(false) {
     grid.clear(); // Stelle sicher, dass grid leer ist

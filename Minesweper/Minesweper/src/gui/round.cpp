@@ -4,7 +4,7 @@
 #include <ncurses.h>
 #include <vector>
 
-std::vector<int> hover_grid(game& g, int start_offset_y) {
+std::vector<int> hover_grid(game& g, int start_offset_y, std::chrono::steady_clock::time_point t_0) {
     // FPS-Management
     FPSTracker fps_tracker(30);  // 60 FPS Ziel
 
@@ -100,6 +100,8 @@ std::vector<int> hover_grid(game& g, int start_offset_y) {
         mvprintw(bottom_y + 4, grid_start_x, "Open fields: %d", g.get_openfields());
         mvprintw(bottom_y + 5, grid_start_x, "Mines: %d", g.get_mine_count());
         mvprintw(bottom_y + 6, grid_start_x, "FPS: %f", fps_tracker.get_current_fps());
+        mvprintw(bottom_y + 7, grid_start_x, "Time: %f", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t_0).count() / 1000.0);
+
        
         refresh();
         

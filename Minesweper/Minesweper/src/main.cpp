@@ -6,6 +6,8 @@
 #include "gui/coustum_difficulty.h"
 #include "game_logic/game.h"
 #include <ncurses.h>
+#include <chrono>
+
 
 
 
@@ -39,9 +41,12 @@ int main() {
 
 
         std::string end_result;
+        std::chrono::steady_clock::time_point t_0 = std::chrono::steady_clock::now(); // Startzeit des Spiels 
+
+
         while (true) {  // Schleife wird über Return-Codes von hover_grid gesteuert
             // Start hover mode and check for game end conditions
-            std::vector<int> selected = hover_grid(minesweeper, info_y + 6);
+            std::vector<int> selected = hover_grid(minesweeper, info_y + 6, t_0); // Start hover mode and get selected field ID
 
             // Check if the game has ended 
             if (selected.size() >= 2) {

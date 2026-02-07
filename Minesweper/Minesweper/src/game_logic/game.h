@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <chrono>
 #include "feld.h"
 #include "../gui/coustum_difficulty.h"
 
@@ -22,6 +23,12 @@ private:
     std::vector<int> mines_ids; // ids of the mines werden auf der gerade f(x,y)=y*width+x gespeichert
     std::vector<int> available_ids; // alle verfügbaren IDs für Minen-Platzierung
     std::vector<int> fields_to_reveal; // alle Felder, die aufgedeckt werden müssen
+
+    //Zeitmessung
+    std::chrono::steady_clock::time_point time_lapsed; // Wie lange läuft das spiel schon
+    std::chrono::steady_clock::time_point t_0; // Wie lange läuft das spiel schon
+
+
     
 public:
     // Konstruktor - erstellt Grid basierend auf width und height
@@ -37,7 +44,6 @@ public:
     void remove_field_to_reveal(int id); // remove field from reveal
     void add_fields_to_reveal_if_0_mines_arround(int id); // add fields to reveal if 0 mines around
 
-
     // Getter methods
     int get_width() const { return width; } // get width of the game
     int get_height() const { return height; } // get height of the game
@@ -47,8 +53,9 @@ public:
     bool get_game_state() const { return game_state; } // get game state
     bool get_first_guess_done() const {return first_guess_done;} // get first guess done
     int get_number_of_fields() const { return number_of_fields; } // get number of fields
-    std::vector<int> get_fields_to_reveal() const { return fields_to_reveal; } // get fields to reveal
+    std::vector<int> get_fields_to_reveal() const { return fields_to_reveal; } // get fields to revea
 
+    
     std::string get_difficulty() const { return difficulty; } // get difficulty
     const std::vector<feld>& get_grid() const { return grid; } // get grid
     feld& get_grid(int id) { return grid[id]; }  // Non-const version for modification
@@ -64,8 +71,7 @@ public:
     void set_game_state(bool value) { game_state = value; }
     void set_first_guess_done(bool value) { first_guess_done = value; }
     void set_first_guess_id(int value) { first_guess_id = value; }
-    //
-   
+
 };
 
 #endif // GAME_H
