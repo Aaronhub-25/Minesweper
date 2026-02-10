@@ -4,8 +4,7 @@
 #include <string>
 
 
-std::string End_page(std::string end_result) {
-    init_input();
+std::string End_page(std::string end_result, std::string user_name, double finish_time) {
     
     const int NUM_OPTIONS = 3;
     const char* options[] = {
@@ -22,6 +21,8 @@ std::string End_page(std::string end_result) {
         
         //Result
         mvprintw(5, 0, end_result.c_str());
+        mvprintw(6, 0, user_name.c_str());
+        mvprintw(7, 0, "Zeit: %.2f Sekunden", finish_time); 
 
         // Display options
         for (int i = 0; i < NUM_OPTIONS; i++) {
@@ -49,12 +50,10 @@ std::string End_page(std::string end_result) {
             case '\n':  // Enter key
             case KEY_ENTER:
             case 13:    // Alternative Enter code
-                cleanup_input();
                 return std::string(options[selected]);
             case 'e':
             case 'E':
             case 27:    // ESC key
-                cleanup_input();
                 return "Exit";  // Default
         }
     }

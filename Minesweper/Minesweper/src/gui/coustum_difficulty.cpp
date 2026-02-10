@@ -4,8 +4,6 @@
 
 // Funktion zum Erfragen der Custom-Einstellungen
 CustomSettings ask_coustum_settings() {
-    init_input();
-    clear();
 
     CustomSettings settings = {10, 10, 10};
     int selected = 0;  // 0 = width, 1 = height, 2 = mines
@@ -76,12 +74,10 @@ CustomSettings ask_coustum_settings() {
             case '\n':  // Enter key
             case KEY_ENTER:
             case 13:
-                cleanup_input();
                 return settings;
             case 'q':
             case 'Q':
             case 27:  // ESC
-                cleanup_input();
                 return settings;  // Return current settings
         }
     }

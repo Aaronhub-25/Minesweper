@@ -2,6 +2,7 @@
 #include "gui/input.h"
 #include "gui/end_page.h"
 #include "gui/round.h"
+#include "gui/enter_user_name.h"
 #include "gui/start_page.h"
 #include "gui/coustum_difficulty.h"
 #include "game_logic/game.h"
@@ -12,9 +13,13 @@
 
 
 int main() {
+    init_input();
     // Get difficulty from user
     std::string difficulty = Start_page();
-    
+    std::string user_name = enter_user_name();
+
+    //Zeit messen
+    double finish_time = 0.0; 
     while (true){
         game minesweeper;
 
@@ -50,6 +55,8 @@ int main() {
 
             // Check if the game has ended 
             if (selected.size() >= 2) {
+            //Zeitspeichern
+            finish_time = std::chrono::duration<double>(std::chrono::steady_clock::now() - t_0).count();
                 if (selected == std::vector<int>{-2, -2}) {
                     // Lsot
                     end_result = "Lost";
@@ -66,7 +73,7 @@ int main() {
             }
             clear();
         }
-        std::string result = End_page(end_result);
+        std::string result = End_page(end_result, user_name, finish_time);
         if (result == "Play again") {
             continue;
         }

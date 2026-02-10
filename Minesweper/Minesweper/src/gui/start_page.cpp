@@ -5,7 +5,6 @@
 
 
 std::string Start_page() {
-    init_input();
     
     const int NUM_OPTIONS = 4;
     const char* options[] = {
@@ -51,12 +50,10 @@ std::string Start_page() {
             case '\n':  // Enter key
             case KEY_ENTER:
             case 13:    // Alternative Enter code
-                cleanup_input();
                 return std::string(options[selected]);
             case 'q':
             case 'Q':
             case 27:    // ESC key
-                cleanup_input();
                 return "Beginner";  // Default
         }
     }

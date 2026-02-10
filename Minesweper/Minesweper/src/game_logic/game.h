@@ -25,8 +25,8 @@ private:
     std::vector<int> fields_to_reveal; // alle Felder, die aufgedeckt werden müssen
 
     //Zeitmessung
-    std::chrono::steady_clock::time_point time_lapsed; // Wie lange läuft das spiel schon
-    std::chrono::steady_clock::time_point t_0; // Wie lange läuft das spiel schon
+    std::string time; // Wie lange war das spiel wird in round gesetzt als string
+
 
 
     
@@ -55,7 +55,8 @@ public:
     int get_number_of_fields() const { return number_of_fields; } // get number of fields
     std::vector<int> get_fields_to_reveal() const { return fields_to_reveal; } // get fields to revea
 
-    
+
+    std::string get_time() const { return time; } // get difficulty
     std::string get_difficulty() const { return difficulty; } // get difficulty
     const std::vector<feld>& get_grid() const { return grid; } // get grid
     feld& get_grid(int id) { return grid[id]; }  // Non-const version for modification
@@ -71,7 +72,7 @@ public:
     void set_game_state(bool value) { game_state = value; }
     void set_first_guess_done(bool value) { first_guess_done = value; }
     void set_first_guess_id(int value) { first_guess_id = value; }
-
+    void set_time(std::string value) { time = value;}
 };
 
 #endif // GAME_H

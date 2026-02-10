@@ -3,10 +3,15 @@
 #include "fps_tracker.h"
 #include <ncurses.h>
 #include <vector>
+#include <iomanip>
+#include <sstream>
 
 std::vector<int> hover_grid(game& g, int start_offset_y, std::chrono::steady_clock::time_point t_0) {
-    // FPS-Management
-    FPSTracker fps_tracker(30);  // 60 FPS Ziel
+    
+    //fps manuell
+    nodelay(stdscr, TRUE);
+    FPSTracker fps_tracker(30); 
+    
 
     //get width and height
     int width = g.get_width();
@@ -101,12 +106,13 @@ std::vector<int> hover_grid(game& g, int start_offset_y, std::chrono::steady_clo
         mvprintw(bottom_y + 5, grid_start_x, "Mines: %d", g.get_mine_count());
         mvprintw(bottom_y + 6, grid_start_x, "FPS: %f", fps_tracker.get_current_fps());
         mvprintw(bottom_y + 7, grid_start_x, "Time: %f", std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t_0).count() / 1000.0);
-
+   
        
         refresh();
         
         // FPS-Management: Warte auf nächsten Frame und starte Zeitmessung für nächsten Frame. Falls noch Felder aufzudecken sind. Alle 5 Frames ein Feld aufdecken.
         fps_tracker.wait_for_next_frame();
+
         std::vector<int> fields_to_reveal = g.get_fields_to_reveal();
         if (!fields_to_reveal.empty()) {
             static int frame_counter = 0;
@@ -156,9 +162,11 @@ std::vector<int> hover_grid(game& g, int start_offset_y, std::chrono::steady_clo
                         // reveal() fügt automatisch Felder zu fields_to_reveal hinzu, wenn das Feld 0 Minen hat
                         // Prüfe ob Spiel beendet wurde
                         if (!g.get_game_state()) {
+                            nodelay(stdscr, FALSE);
                             return {-2, -2};  // Spezieller Code für Game Over (Mine aufgedeckt)
                         }
                         if (g.get_openfields() == 0) {
+                            nodelay(stdscr, FALSE);
                             return {-3, -3};  // Spezieller Code für Win (alle Felder aufgedeckt)
                         }
                         // Nach erfolgreichem Reveal: Grid wird beim nächsten Durchlauf der while-Schleife aktualisiert
@@ -178,6 +186,7 @@ std::vector<int> hover_grid(game& g, int start_offset_y, std::chrono::steady_clo
             case 'q':
             case 'Q':
             case 27:    // ESC key
+                nodelay(stdscr, FALSE);
                 return {-1, -1};
         }
     }
