@@ -24,7 +24,7 @@ void game::build_game(const std::string& difficulty) {
         set_width(8);
         set_height(8);
         set_number_of_fields(get_width() * get_height());
-        set_mine_count(10);
+        set_mine_count(7);
         set_openfields(get_number_of_fields() - get_mine_count());
     }
     else if (get_difficulty() == "Advanced") {

@@ -6,8 +6,10 @@
 #include "gui/start_page.h"
 #include "gui/coustum_difficulty.h"
 #include "game_logic/game.h"
+#include "gui/scoreboard_managment.h"
 #include <ncurses.h>
 #include <chrono>
+#include <vector>
 
 
 
@@ -20,6 +22,7 @@ int main() {
 
     //Zeit messen
     double finish_time = 0.0; 
+
     while (true){
         game minesweeper;
 
@@ -64,6 +67,7 @@ int main() {
                 } else if (selected == std::vector<int>{-3, -3}) {
                     // Win 
                     end_result = "Won";
+                    save_high_score(user_name, finish_time);
                     break;
                 } else if (selected == std::vector<int>{-1, -1}) {
                     // Exit Game
@@ -73,7 +77,7 @@ int main() {
             }
             clear();
         }
-        std::string result = End_page(end_result, user_name, finish_time);
+        std::string result = End_page(end_result, user_name, finish_time, load_high_score() );
         if (result == "Play again") {
             continue;
         }
