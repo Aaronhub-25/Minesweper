@@ -95,7 +95,7 @@ void game::place_mines(int first_guess_id) {
     
     mines_ids.clear(); // Leere die Liste der Minen-IDs
     
-    // Erstelle Kopie der verfügbaren IDs (die bereits in generate_plane() erstellt wurden)
+    // Erstelle Kopie der verfügbaren IDs, um mögliche minen zu tracken
     std::vector<int> available_ids_copy = available_ids;
     // Remove first_guess_id from the list
     available_ids_copy.erase(std::remove(available_ids_copy.begin(), available_ids_copy.end(), first_guess_id), available_ids_copy.end());

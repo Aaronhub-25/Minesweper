@@ -122,6 +122,12 @@ std::vector<int> hover_grid(game& g, int start_offset_y, std::chrono::steady_clo
                 int field = fields_to_reveal[0];
                 g.reveal_open_adjacent_fields(field);
                 g.remove_field_to_reveal(field);
+
+            //Extra einfügen der Win Bedingung in auto reveal, kann möglich sein, dass die letzte feld nicht manuell geöffnet wird
+            if (g.get_openfields() == 0) {
+                nodelay(stdscr, FALSE);
+                return {-3, -3};  // Spezieller Code für Win (alle Felder aufgedeckt)
+            }       
             }
         }
         fps_tracker.start_frame();
@@ -165,13 +171,12 @@ std::vector<int> hover_grid(game& g, int start_offset_y, std::chrono::steady_clo
                             nodelay(stdscr, FALSE);
                             return {-2, -2};  // Spezieller Code für Game Over (Mine aufgedeckt)
                         }
+                        //Prüfe ob Spiel gewonnen analoge abfrage im autoreveal
                         if (g.get_openfields() == 0) {
                             nodelay(stdscr, FALSE);
                             return {-3, -3};  // Spezieller Code für Win (alle Felder aufgedeckt)
                         }
-                        // Nach erfolgreichem Reveal: Grid wird beim nächsten Durchlauf der while-Schleife aktualisiert
-                        // Cursor bleibt an der aktuellen Position
-                        continue; // Überspringe den Rest und zeichne Grid neu
+                        continue; 
                     }
                 }
                 break;

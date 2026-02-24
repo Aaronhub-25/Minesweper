@@ -56,7 +56,7 @@ public:
     std::vector<int> get_fields_to_reveal() const { return fields_to_reveal; } // get fields to revea
 
 
-    std::string get_time() const { return time; } // get difficulty
+    std::string get_time() const { return time; } // get time
     std::string get_difficulty() const { return difficulty; } // get difficulty
     const std::vector<feld>& get_grid() const { return grid; } // get grid
     feld& get_grid(int id) { return grid[id]; }  // Non-const version for modification
